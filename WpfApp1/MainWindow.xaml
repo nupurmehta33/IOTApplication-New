@@ -4,9 +4,189 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="IoT Dashboard" Height="900" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8F9FA">
+    
+    <Window.Resources>
+        <Style x:Key="PanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#E9ECEF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Margin" Value="12"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#000000" Direction="270" ShadowDepth="3" Opacity="0.1" BlurRadius="8"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="PanelTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#212529"/>
+            <Setter Property="Margin" Value="16,16,16,8"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+        
+        <Style x:Key="ChartContainerStyle" TargetType="Grid">
+            <Setter Property="Margin" Value="8"/>
+        </Style>
+        
+        <Style x:Key="TabItemStyle" TargetType="TabItem">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="Background" Value="#F8F9FA"/>
+            <Setter Property="BorderBrush" Value="#E9ECEF"/>
+        </Style>
+        
+        <Style x:Key="CloseButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Background" Value="#FFDC3545"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderBrush" Value="#FFDC3545"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
-
+        <!-- Close Button -->
+        <Button x:Name="CloseButton" 
+                Content="✕" 
+                Style="{StaticResource CloseButtonStyle}"
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Top" 
+                Margin="0,15,15,0"
+                Panel.ZIndex="1000"
+                Click="CloseButton_Click"/>
+        
+        <!-- Main Content -->
+        <TabControl Background="Transparent" BorderThickness="0" Panel.ZIndex="1">
+            <!-- Dashboard Tab -->
+            <TabItem Header="Dashboard" Style="{StaticResource TabItemStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Top Left: Traveled Distance Chart -->
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource PanelStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text="🚗 Traveled distance (431km) +45%" Style="{StaticResource PanelTitleStyle}"/>
+                            <Grid Grid.Row="1" Style="{StaticResource ChartContainerStyle}">
+                                <lvc:CartesianChart x:Name="DistanceChart" Series="{Binding DistanceSeries}"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Top Right: Engine Hours Stacked Bar Chart -->
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource PanelStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text="⏱️ Engine Hours" Style="{StaticResource PanelTitleStyle}"/>
+                            <Grid Grid.Row="1" Style="{StaticResource ChartContainerStyle}">
+                                <lvc:CartesianChart x:Name="EngineHoursChart" Series="{Binding EngineHoursSeries}"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Bottom Left: Activity Breakdown Donut Chart -->
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource PanelStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text=" Activity Breakdown" Style="{StaticResource PanelTitleStyle}"/>
+                            <Grid Grid.Row="1" Style="{StaticResource ChartContainerStyle}">
+                                <Grid>
+                                    <lvc:PieChart x:Name="ActivityChart" Series="{Binding ActivitySeries}" LegendPosition="Right"/>
+                                    <TextBlock Text="1,246 Hours"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontSize="24"
+                                               FontWeight="Bold"
+                                               Foreground="#212529"
+                                               IsHitTestVisible="False"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Bottom Right: Messages Received Bar Chart -->
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource PanelStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text=" Messages Received" Style="{StaticResource PanelTitleStyle}"/>
+                            <Grid Grid.Row="1" Style="{StaticResource ChartContainerStyle}">
+                                <lvc:CartesianChart x:Name="MessagesChart" Series="{Binding MessagesSeries}"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+            
+            <!-- Gantt Chart Tab -->
+            <TabItem Header="Day Overview" Style="{StaticResource TabItemStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Title -->
+                    <TextBlock Grid.Row="0" 
+                               Text="📊 Day Overview" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#212529" 
+                               Margin="20,20,20,10"
+                               HorizontalAlignment="Center"/>
+                    
+                    <!-- Gantt Chart -->
+                    <Border Grid.Row="1" Style="{StaticResource PanelStyle}" Margin="20">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text="Asset Timeline" Style="{StaticResource PanelTitleStyle}"/>
+                            <Grid Grid.Row="1" Style="{StaticResource ChartContainerStyle}">
+                                <lvc:CartesianChart x:Name="GanttChart" Series="{Binding GanttSeries}" LegendPosition="Bottom"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>
